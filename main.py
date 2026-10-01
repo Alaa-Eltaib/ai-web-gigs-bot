@@ -37,24 +37,16 @@ def process_jobs(jobs):
             continue
 
         title = job["title"]
-        description = job.get(
-            "description",
-            ""
-        )
+        description = job.get("description", "")
 
         relevant = is_relevant_job(
             title,
             description
         )
 
-        # نخزن كل وظيفة جديدة
-        save_job(
-            job,
-            relevant=relevant
-        )
-
-        # لو مش مناسبة خلاص
+        # لو مش مناسبة: خزنيها فقط عشان ما نفحصهاش تاني
         if not relevant:
+            save_job(job, relevant=False)
             continue
 
         print(
@@ -62,10 +54,12 @@ def process_jobs(jobs):
             f"{job['title']}"
         )
 
+        # الوظيفة المناسبة تتبعت الأول
         sent = send_job(job)
 
         if sent:
             print("✅ Sent")
+            save_job(job, relevant=True)
         else:
             print("❌ Telegram failed")
 
